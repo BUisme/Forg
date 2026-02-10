@@ -1,0 +1,1770 @@
+<!doctype html>
+<html lang="th">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Frog Farm Manager (Offline File + GitHub Pages)</title>
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#0f1a30;
+      --muted:#9fb0d0;
+      --text:#e9f0ff;
+      --accent:#7dd3fc;
+      --accent2:#a7f3d0;
+      --danger:#fb7185;
+      --ok:#86efac;
+      --warn:#fbbf24;
+      --line:rgba(255,255,255,.10);
+      --shadow: 0 18px 60px rgba(0,0,0,.35);
+      --radius:18px;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, "Noto Sans Thai", sans-serif;
+      background: radial-gradient(1200px 600px at 20% -10%, rgba(125,211,252,.18), transparent 60%),
+                  radial-gradient(900px 500px at 95% 0%, rgba(167,243,208,.14), transparent 55%),
+                  var(--bg);
+      color:var(--text);
+    }
+    a{color:var(--accent)}
+    header{
+      position: sticky; top:0; z-index:5;
+      backdrop-filter: blur(10px);
+      background: rgba(11,18,32,.75);
+      border-bottom:1px solid var(--line);
+    }
+    .wrap{max-width:1100px; margin:0 auto; padding:18px 16px}
+    .topbar{
+      display:flex; gap:12px; align-items:center; justify-content:space-between;
+      flex-wrap:wrap;
+    }
+    .brand{
+      display:flex; align-items:center; gap:10px;
+      font-weight:800; letter-spacing:.2px;
+    }
+    .pill{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:10px 12px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      border-radius:999px;
+      color:var(--text);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.05);
+      font-size:14px;
+    }
+    .pill small{color:var(--muted)}
+    .nav{
+      display:flex; gap:8px; flex-wrap:wrap;
+    }
+    button, .btn{
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.05);
+      color:var(--text);
+      border-radius:12px;
+      padding:10px 12px;
+      cursor:pointer;
+      transition: transform .05s ease, background .15s ease, border-color .15s ease;
+      font-weight:650;
+    }
+    button:hover, .btn:hover{background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18)}
+    button:active, .btn:active{transform: translateY(1px)}
+    button.primary{
+      background: linear-gradient(135deg, rgba(125,211,252,.22), rgba(167,243,208,.18));
+      border-color: rgba(125,211,252,.35);
+    }
+    button.danger{
+      background: rgba(251,113,133,.12);
+      border-color: rgba(251,113,133,.35);
+    }
+    .tabbtn[aria-current="page"]{
+      outline:2px solid rgba(125,211,252,.40);
+      background: rgba(125,211,252,.10);
+      border-color: rgba(125,211,252,.45);
+    }
+    main{padding:18px 0 60px}
+    .grid{
+      display:grid;
+      gap:14px;
+    }
+    @media (min-width: 900px){
+      .grid.cols2{grid-template-columns: 1.1fr .9fr;}
+      .grid.cols3{grid-template-columns: repeat(3, 1fr);}
+      .grid.cols4{grid-template-columns: repeat(4, 1fr);}
+    }
+    .card{
+      background: linear-gradient(180deg, rgba(255,255,255,.06), rgba(255,255,255,.03));
+      border:1px solid var(--line);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding:14px;
+    }
+    .card h2, .card h3{margin:0 0 10px}
+    .muted{color:var(--muted)}
+    .kpi{
+      display:flex; flex-direction:column; gap:6px;
+      padding:14px;
+      border-radius: var(--radius);
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.03);
+    }
+    .kpi .label{color:var(--muted); font-size:13px}
+    .kpi .value{font-size:22px; font-weight:820; letter-spacing:.2px}
+    .kpi .sub{font-size:12px; color:var(--muted)}
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
+    .row.end{justify-content:flex-end}
+    .row.between{justify-content:space-between}
+    .field{
+      display:flex; flex-direction:column; gap:6px;
+      min-width: 160px;
+      flex:1;
+    }
+    .field label{font-size:13px; color:var(--muted)}
+    input, select, textarea{
+      width:100%;
+      border:1px solid var(--line);
+      border-radius: 12px;
+      padding:10px 10px;
+      background: rgba(11,18,32,.35);
+      color: var(--text);
+      outline:none;
+    }
+    textarea{min-height:90px; resize:vertical}
+    .table{
+      width:100%;
+      border-collapse: collapse;
+      overflow:hidden;
+      border-radius: 14px;
+      border:1px solid var(--line);
+    }
+    .table th, .table td{
+      padding:10px 10px;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+      vertical-align: top;
+    }
+    .table th{color:var(--muted); text-align:left; font-weight:720}
+    .table tr:last-child td{border-bottom:none}
+    .tag{
+      display:inline-flex; align-items:center; gap:6px;
+      padding:5px 10px;
+      border-radius:999px;
+      border:1px solid var(--line);
+      background: rgba(255,255,255,.04);
+      font-size:12px;
+      color:var(--muted);
+    }
+    .tag.ok{border-color: rgba(134,239,172,.35); color: rgba(134,239,172,.95); background: rgba(134,239,172,.08)}
+    .tag.warn{border-color: rgba(251,191,36,.35); color: rgba(251,191,36,.95); background: rgba(251,191,36,.08)}
+    .tag.bad{border-color: rgba(251,113,133,.35); color: rgba(251,113,133,.95); background: rgba(251,113,133,.08)}
+    .sep{height:1px; background: var(--line); margin:10px 0}
+    .hint{
+      font-size:13px; color:var(--muted);
+      line-height:1.45;
+    }
+    .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;}
+    .toast{
+      position: fixed;
+      left: 50%;
+      bottom: 18px;
+      transform: translateX(-50%);
+      background: rgba(15,26,48,.92);
+      border:1px solid rgba(255,255,255,.15);
+      box-shadow: 0 18px 50px rgba(0,0,0,.45);
+      border-radius: 14px;
+      padding: 10px 12px;
+      max-width: 92vw;
+      display:none;
+      z-index: 99;
+    }
+    .toast.show{display:block}
+    .small{font-size:12px}
+    canvas{width:100%; height:280px; display:block; background: rgba(0,0,0,.18); border:1px solid var(--line); border-radius: 16px;}
+    .dangerText{color: var(--danger)}
+  </style>
+</head>
+<body>
+<header>
+  <div class="wrap">
+    <div class="topbar">
+      <div class="brand">
+        <span style="font-size:22px">🐸</span>
+        <div>
+          <div style="font-size:15px; font-weight:850;">Frog Farm Manager</div>
+          <div class="small muted">เว็บรันบน GitHub Pages • ข้อมูลเก็บเป็นไฟล์ออฟไลน์ (ส่วนตัว)</div>
+        </div>
+      </div>
+      <div class="row">
+        <div class="pill" id="fileStatus">
+          <span>📁</span>
+          <div>
+            <div style="font-weight:800">ยังไม่เชื่อมไฟล์</div>
+            <small>ใช้ Import/Export หรือเชื่อมไฟล์เพื่อบันทึกอัตโนมัติ</small>
+          </div>
+        </div>
+        <button class="primary" id="btnQuickSave">💾 บันทึกลงไฟล์</button>
+      </div>
+    </div>
+    <div class="sep"></div>
+    <div class="nav">
+      <button class="tabbtn" data-tab="dashboard">📊 Dashboard</button>
+      <button class="tabbtn" data-tab="daily">🗓️ บันทึกรายวัน</button>
+      <button class="tabbtn" data-tab="costs">💸 ต้นทุน</button>
+      <button class="tabbtn" data-tab="prices">🏷️ ราคาขาย</button>
+      <button class="tabbtn" data-tab="sales">🧾 การขาย (ทยอยขาย)</button>
+      <button class="tabbtn" data-tab="backup">🔒 สำรอง/ไฟล์</button>
+      <button class="tabbtn" data-tab="settings">⚙️ ตั้งค่า</button>
+    </div>
+  </div>
+</header>
+
+<main>
+  <div class="wrap">
+    <div id="app"></div>
+  </div>
+</main>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/** ============================================================
+ * Frog Farm Manager – Single-file app
+ * - Works on GitHub Pages (static)
+ * - Data can be saved to local JSON file via File System Access API (Chrome/Edge)
+ * - Fallback: Export/Import JSON download/upload
+ * - Tracks: tadpole cost, feed costs (S/M/L), supplement, water, cage assets, daily deaths, staged sales, price tiers, summary & graphs
+ * ============================================================ */
+
+// ---------- Utilities ----------
+const $ = (sel, el=document) => el.querySelector(sel);
+const $$ = (sel, el=document) => Array.from(el.querySelectorAll(sel));
+const nowISODate = () => new Date().toISOString().slice(0,10);
+const toNum = (v) => {
+  const n = Number(String(v ?? '').replace(/,/g,'').trim());
+  return Number.isFinite(n) ? n : 0;
+};
+const money = (n) => {
+  const x = toNum(n);
+  return x.toLocaleString('th-TH', {maximumFractionDigits:2});
+};
+const kg = (n) => {
+  const x = toNum(n);
+  return x.toLocaleString('th-TH', {maximumFractionDigits:3});
+};
+const pct = (n) => {
+  const x = toNum(n);
+  return x.toLocaleString('th-TH', {maximumFractionDigits:2}) + '%';
+};
+const uid = () => Math.random().toString(16).slice(2) + Date.now().toString(16);
+
+// ---------- Toast ----------
+let toastTimer = null;
+function toast(msg){
+  const el = $('#toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=> el.classList.remove('show'), 2600);
+}
+
+// ---------- IndexedDB minimal KV ----------
+const IDB_NAME = 'frog_farm_kv';
+const IDB_STORE = 'kv';
+function idbOpen(){
+  return new Promise((resolve, reject)=>{
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = () => req.result.createObjectStore(IDB_STORE);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbGet(key){
+  const db = await idbOpen();
+  return new Promise((resolve, reject)=>{
+    const tx = db.transaction(IDB_STORE, 'readonly');
+    const st = tx.objectStore(IDB_STORE);
+    const req = st.get(key);
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function idbSet(key, val){
+  const db = await idbOpen();
+  return new Promise((resolve, reject)=>{
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    const st = tx.objectStore(IDB_STORE);
+    const req = st.put(val, key);
+    req.onsuccess = () => resolve(true);
+    req.onerror = () => reject(req.error);
+  });
+}
+
+// ---------- Data Model ----------
+function defaultCycle(){
+  return {
+    id: uid(),
+    name: 'รอบเลี้ยง 1',
+    startDate: nowISODate(),
+    initialCount: 1000,
+    notes: '',
+    tadpoles: { date: nowISODate(), count: 1000, totalCost: 0, vendor: '', transportCost: 0 },
+    feed: [],        // {id,date,size:'S|M|L',kg,cost,note}
+    supplements: [], // {id,date,name,qty,cost,note}
+    water: [],       // {id,date,volume,cost,note,unit:'m3|L|other'}
+    cages: [],       // {id,date,name,price,mode:'amortize|full',cyclesUseful:10,note}
+    deaths: [],      // {id,date,count,cause,note}
+    sales: [],       // {id,date,soldKg,pricePerKg,autoTier:true,total,fee,net, note, soldCount?}
+    priceTiers: [
+      {id: uid(), minKg: 1,  maxKg: 3,  pricePerKg: 100},
+      {id: uid(), minKg: 4,  maxKg: 5,  pricePerKg: 90},
+      {id: uid(), minKg: 6,  maxKg: null,  pricePerKg: 80},
+    ],
+  };
+}
+function defaultData(){
+  return {
+    version: 1,
+    meta: {
+      owner: '',
+      farmName: '',
+      currency: 'THB',
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    },
+    settings: {
+      autosaveToFile: false,
+      dateLocale: 'th-TH',
+    },
+    cycles: [ defaultCycle() ],
+    activeCycleId: null,
+  };
+}
+
+// ---------- App State ----------
+let state = {
+  tab: 'dashboard',
+  data: defaultData(),
+  fileHandle: null,
+  lastSavedAt: null,
+};
+let saveDebounce = null;
+
+// ---------- File Handling (File System Access API) ----------
+function supportsFSAccess(){
+  return !!(window.showOpenFilePicker && window.showSaveFilePicker);
+}
+async function loadFromFileHandle(handle){
+  const file = await handle.getFile();
+  const txt = await file.text();
+  const obj = JSON.parse(txt);
+  validateAndSetData(obj);
+  state.fileHandle = handle;
+  await idbSet('fileHandle', handle);
+  await idbSet('data', state.data);
+  updateFileStatus();
+  toast('โหลดข้อมูลจากไฟล์แล้ว ✅');
+}
+async function saveToFileHandle(handle){
+  const txt = JSON.stringify(state.data, null, 2);
+  const writable = await handle.createWritable();
+  await writable.write(txt);
+  await writable.close();
+  state.lastSavedAt = new Date();
+  state.data.meta.updatedAt = new Date().toISOString();
+  await idbSet('data', state.data);
+  updateFileStatus();
+  toast('บันทึกลงไฟล์แล้ว 💾');
+}
+async function connectExistingFile(){
+  if(!supportsFSAccess()){
+    toast('เบราว์เซอร์นี้ไม่รองรับการเชื่อมไฟล์ตรง ๆ (ใช้ Import/Export แทนได้) 📎');
+    return;
+  }
+  const [handle] = await window.showOpenFilePicker({
+    types: [{description:'Frog Farm Data', accept:{'application/json':['.json']}}],
+    multiple: false
+  });
+  await loadFromFileHandle(handle);
+}
+async function createNewFile(){
+  if(!supportsFSAccess()){
+    toast('เบราว์เซอร์นี้ไม่รองรับการสร้าง/เชื่อมไฟล์ตรง ๆ (ใช้ Export แทนได้) 📎');
+    return;
+  }
+  const handle = await window.showSaveFilePicker({
+    suggestedName: 'frog_farm_data.json',
+    types: [{description:'JSON', accept:{'application/json':['.json']}}],
+  });
+  state.fileHandle = handle;
+  await idbSet('fileHandle', handle);
+  await saveToFileHandle(handle);
+}
+async function quickSave(){
+  if(state.fileHandle){
+    await saveToFileHandle(state.fileHandle);
+    return;
+  }
+  // If no handle, prefer create new via picker if supported; else export download.
+  if(supportsFSAccess()){
+    await createNewFile();
+  }else{
+    exportJSONDownload();
+  }
+}
+async function maybeAutoSaveToFile(){
+  if(!state.data.settings.autosaveToFile) return;
+  if(!state.fileHandle) return;
+  clearTimeout(saveDebounce);
+  saveDebounce = setTimeout(async ()=>{
+    try{ await saveToFileHandle(state.fileHandle); }
+    catch(e){ console.warn(e); toast('บันทึกอัตโนมัติไม่สำเร็จ (ลองกดบันทึกเอง)'); }
+  }, 700);
+}
+
+// ---------- Data validation & persistence ----------
+function validateAndSetData(obj){
+  // Light validation: must have cycles
+  if(!obj || typeof obj !== 'object') throw new Error('Invalid JSON');
+  if(!Array.isArray(obj.cycles) || obj.cycles.length === 0) throw new Error('No cycles');
+  if(!obj.meta) obj.meta = {owner:'', farmName:'', currency:'THB', createdAt:new Date().toISOString(), updatedAt:new Date().toISOString()};
+  if(!obj.settings) obj.settings = {autosaveToFile:false, dateLocale:'th-TH'};
+  if(!obj.activeCycleId) obj.activeCycleId = obj.cycles[0].id;
+  state.data = obj;
+}
+async function loadApp(){
+  // Restore data
+  const data = await idbGet('data');
+  const handle = await idbGet('fileHandle');
+  if(data){
+    try{ validateAndSetData(data); }catch(e){ console.warn(e); state.data = defaultData(); }
+  }else{
+    state.data = defaultData();
+    state.data.activeCycleId = state.data.cycles[0].id;
+    await idbSet('data', state.data);
+  }
+  if(handle) state.fileHandle = handle;
+  if(!state.data.activeCycleId) state.data.activeCycleId = state.data.cycles[0].id;
+  updateFileStatus();
+
+  // Tab from hash
+  const h = location.hash.replace('#','');
+  if(h) state.tab = h;
+
+  // Bind
+  $('#btnQuickSave').addEventListener('click', ()=> quickSave().catch(err=>{console.warn(err); toast('บันทึกไม่สำเร็จ');}));
+
+  // Render
+  render();
+}
+function updateFileStatus(){
+  const el = $('#fileStatus');
+  const autosave = state.data.settings.autosaveToFile;
+  if(state.fileHandle){
+    el.innerHTML = `
+      <span>📁</span>
+      <div>
+        <div style="font-weight:800">เชื่อมไฟล์แล้ว</div>
+        <small>${autosave ? 'Auto-save: เปิด' : 'Auto-save: ปิด'}${state.lastSavedAt ? ' • บันทึกล่าสุด: ' + state.lastSavedAt.toLocaleString('th-TH') : ''}</small>
+      </div>
+    `;
+  }else{
+    el.innerHTML = `
+      <span>📁</span>
+      <div>
+        <div style="font-weight:800">ยังไม่เชื่อมไฟล์</div>
+        <small>ใช้ Import/Export หรือเชื่อมไฟล์เพื่อบันทึกอัตโนมัติ</small>
+      </div>
+    `;
+  }
+}
+
+// ---------- Computations ----------
+function getActiveCycle(){
+  const id = state.data.activeCycleId || state.data.cycles[0]?.id;
+  return state.data.cycles.find(c=>c.id===id) || state.data.cycles[0];
+}
+function sortByDate(a,b){ return String(a.date).localeCompare(String(b.date)); }
+
+function sumCosts(cycle){
+  const tad = toNum(cycle.tadpoles.totalCost) + toNum(cycle.tadpoles.transportCost);
+  const feed = cycle.feed.reduce((s,x)=> s + toNum(x.cost), 0);
+  const sup = cycle.supplements.reduce((s,x)=> s + toNum(x.cost), 0);
+  const water = cycle.water.reduce((s,x)=> s + toNum(x.cost), 0);
+  const cages = cycle.cages.reduce((s,x)=>{
+    const price = toNum(x.price);
+    if(x.mode === 'amortize'){
+      const k = Math.max(1, toNum(x.cyclesUseful));
+      return s + price / k;
+    }
+    return s + price;
+  },0);
+  return {tad, feed, sup, water, cages, total: tad+feed+sup+water+cages};
+}
+function sumSales(cycle){
+  const total = cycle.sales.reduce((s,x)=> s + toNum(x.total), 0);
+  const fees = cycle.sales.reduce((s,x)=> s + toNum(x.fee), 0);
+  const net = cycle.sales.reduce((s,x)=> s + toNum(x.net), 0);
+  return {total, fees, net};
+}
+function deathStats(cycle){
+  const deathsTotal = cycle.deaths.reduce((s,x)=> s + toNum(x.count), 0);
+  const init = toNum(cycle.initialCount);
+  const remain = Math.max(0, init - deathsTotal);
+  const survival = init>0 ? (remain/init)*100 : 0;
+  return {init, deathsTotal, remain, survival};
+}
+function inferTierPrice(cycle, soldKg){
+  const tiers = [...cycle.priceTiers].sort((a,b)=> (toNum(a.minKg)-toNum(b.minKg)));
+  const kgVal = toNum(soldKg);
+  for(const t of tiers){
+    const min = toNum(t.minKg);
+    const max = (t.maxKg===null || t.maxKg===undefined || t.maxKg==='') ? null : toNum(t.maxKg);
+    if(kgVal >= min && (max===null || kgVal <= max)) return toNum(t.pricePerKg);
+  }
+  // If nothing matches, take last tier price
+  return tiers.length ? toNum(tiers[tiers.length-1].pricePerKg) : 0;
+}
+function recalcSale(cycle, sale){
+  const soldKg = toNum(sale.soldKg);
+  let pricePerKg = toNum(sale.pricePerKg);
+  if(sale.autoTier) pricePerKg = inferTierPrice(cycle, soldKg);
+  const total = soldKg * pricePerKg;
+  const fee = toNum(sale.fee);
+  const net = total - fee;
+  return {...sale, pricePerKg, total, net};
+}
+
+// ---------- Simple chart (Canvas) ----------
+function drawLineChart(canvas, seriesList, opts={}){
+  // seriesList: [{name, points:[{x:dateISO, y:number}], color? ignored}]
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width = canvas.clientWidth * devicePixelRatio;
+  const H = canvas.height = canvas.clientHeight * devicePixelRatio;
+  ctx.clearRect(0,0,W,H);
+
+  const padL = 54*devicePixelRatio, padR=14*devicePixelRatio, padT=14*devicePixelRatio, padB=36*devicePixelRatio;
+  const plotW = W - padL - padR;
+  const plotH = H - padT - padB;
+
+  const allPts = seriesList.flatMap(s=>s.points||[]);
+  if(allPts.length === 0){
+    ctx.fillStyle = 'rgba(233,240,255,.70)';
+    ctx.font = `${14*devicePixelRatio}px sans-serif`;
+    ctx.fillText('ยังไม่มีข้อมูลกราฟ', padL, padT + 22*devicePixelRatio);
+    return;
+  }
+
+  // sort by date; map x to index
+  const dates = Array.from(new Set(allPts.map(p=>p.x))).sort();
+  const xToI = new Map(dates.map((d,i)=>[d,i]));
+  const xmin = 0, xmax = Math.max(1, dates.length-1);
+
+  let ymin = Infinity, ymax = -Infinity;
+  for(const p of allPts){
+    ymin = Math.min(ymin, toNum(p.y));
+    ymax = Math.max(ymax, toNum(p.y));
+  }
+  if(ymin === ymax){ ymax = ymin + 1; }
+  const yPad = (ymax - ymin)*0.08;
+  ymin -= yPad; ymax += yPad;
+
+  const xScale = (i)=> padL + ( (i - xmin) / (xmax - xmin) ) * plotW;
+  const yScale = (v)=> padT + (1 - ((v - ymin)/(ymax - ymin))) * plotH;
+
+  // grid
+  ctx.strokeStyle = 'rgba(255,255,255,.10)';
+  ctx.lineWidth = 1*devicePixelRatio;
+  ctx.beginPath();
+  for(let g=0; g<=4; g++){
+    const y = padT + (g/4)*plotH;
+    ctx.moveTo(padL, y); ctx.lineTo(padL+plotW, y);
+  }
+  ctx.stroke();
+
+  // axes labels (y min/max)
+  ctx.fillStyle = 'rgba(233,240,255,.65)';
+  ctx.font = `${12*devicePixelRatio}px sans-serif`;
+  ctx.fillText(money(ymax), 8*devicePixelRatio, padT + 10*devicePixelRatio);
+  ctx.fillText(money(ymin), 8*devicePixelRatio, padT + plotH);
+
+  // x labels (first/last)
+  const first = dates[0], last = dates[dates.length-1];
+  ctx.fillText(first, padL, H - 12*devicePixelRatio);
+  ctx.fillText(last, padL + plotW - ctx.measureText(last).width, H - 12*devicePixelRatio);
+
+  // series draw
+  const palette = [
+    'rgba(125,211,252,.95)',
+    'rgba(167,243,208,.95)',
+    'rgba(251,191,36,.95)',
+    'rgba(251,113,133,.95)',
+  ];
+  seriesList.forEach((s, idx)=>{
+    const pts = (s.points||[]).slice().sort((a,b)=> String(a.x).localeCompare(String(b.x)));
+    if(pts.length===0) return;
+    ctx.strokeStyle = palette[idx % palette.length];
+    ctx.lineWidth = 2.2*devicePixelRatio;
+    ctx.beginPath();
+    pts.forEach((p, i)=>{
+      const x = xScale(xToI.get(p.x));
+      const y = yScale(toNum(p.y));
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    });
+    ctx.stroke();
+
+    // dots
+    ctx.fillStyle = palette[idx % palette.length];
+    pts.forEach((p)=>{
+      const x = xScale(xToI.get(p.x));
+      const y = yScale(toNum(p.y));
+      ctx.beginPath(); ctx.arc(x,y, 3.2*devicePixelRatio, 0, Math.PI*2); ctx.fill();
+    });
+  });
+
+  // legend
+  const legendY = padT + 18*devicePixelRatio;
+  let legendX = padL;
+  ctx.font = `${12*devicePixelRatio}px sans-serif`;
+  seriesList.forEach((s, idx)=>{
+    const text = s.name || `Series ${idx+1}`;
+    const color = palette[idx % palette.length];
+    ctx.fillStyle = color;
+    ctx.fillRect(legendX, legendY-10*devicePixelRatio, 10*devicePixelRatio, 10*devicePixelRatio);
+    ctx.fillStyle = 'rgba(233,240,255,.80)';
+    ctx.fillText(text, legendX + 14*devicePixelRatio, legendY);
+    legendX += (14 + ctx.measureText(text).width + 22)*devicePixelRatio;
+  });
+}
+
+// ---------- Rendering ----------
+function setTab(tab){
+  state.tab = tab;
+  location.hash = tab;
+  $$('.tabbtn').forEach(b=>{
+    b.setAttribute('aria-current', b.dataset.tab === tab ? 'page' : 'false');
+  });
+  render();
+}
+function render(){
+  // tab buttons
+  $$('.tabbtn').forEach(btn=>{
+    btn.onclick = ()=> setTab(btn.dataset.tab);
+  });
+  $$('.tabbtn').forEach(b=> b.setAttribute('aria-current', b.dataset.tab === state.tab ? 'page' : 'false'));
+
+  const app = $('#app');
+  const cycle = getActiveCycle();
+  if(!cycle){
+    app.innerHTML = `<div class="card"><h2>ยังไม่มีรอบเลี้ยง</h2></div>`;
+    return;
+  }
+
+  if(state.tab === 'dashboard') app.innerHTML = viewDashboard(cycle);
+  else if(state.tab === 'daily') app.innerHTML = viewDaily(cycle);
+  else if(state.tab === 'costs') app.innerHTML = viewCosts(cycle);
+  else if(state.tab === 'prices') app.innerHTML = viewPrices(cycle);
+  else if(state.tab === 'sales') app.innerHTML = viewSales(cycle);
+  else if(state.tab === 'backup') app.innerHTML = viewBackup(cycle);
+  else if(state.tab === 'settings') app.innerHTML = viewSettings(cycle);
+  else app.innerHTML = `<div class="card"><h2>ไม่พบหน้า</h2></div>`;
+
+  bindCommon(cycle);
+
+  // Charts after DOM
+  if(state.tab === 'dashboard'){
+    const c1 = $('#chartDeaths');
+    const c2 = $('#chartMoney');
+    if(c1) renderDashboardCharts(cycle, c1, c2);
+  }
+}
+
+function bindCommon(cycle){
+  // Cycle selector
+  const sel = $('#cycleSelect');
+  if(sel){
+    sel.onchange = ()=>{
+      state.data.activeCycleId = sel.value;
+      persistData();
+      render();
+    };
+  }
+  const btnNew = $('#btnNewCycle');
+  if(btnNew){
+    btnNew.onclick = ()=>{
+      const idx = state.data.cycles.length + 1;
+      const c = defaultCycle();
+      c.name = `รอบเลี้ยง ${idx}`;
+      c.startDate = nowISODate();
+      c.initialCount = 1000;
+      c.tadpoles.count = 1000;
+      state.data.cycles.unshift(c);
+      state.data.activeCycleId = c.id;
+      persistData();
+      toast('สร้างรอบเลี้ยงใหม่แล้ว 🐸');
+      render();
+    };
+  }
+  const btnDel = $('#btnDeleteCycle');
+  if(btnDel){
+    btnDel.onclick = ()=>{
+      if(state.data.cycles.length<=1){
+        toast('ต้องมีอย่างน้อย 1 รอบเลี้ยง'); return;
+      }
+      if(!confirm('ลบรอบเลี้ยงนี้? ข้อมูลทั้งหมดของรอบนี้จะหาย')) return;
+      state.data.cycles = state.data.cycles.filter(x=> x.id !== cycle.id);
+      state.data.activeCycleId = state.data.cycles[0].id;
+      persistData();
+      toast('ลบรอบเลี้ยงแล้ว');
+      render();
+    };
+  }
+}
+
+function headerCycleBar(cycle){
+  const options = state.data.cycles.map(c => `<option value="${c.id}" ${c.id===cycle.id?'selected':''}>${escapeHtml(c.name)}</option>`).join('');
+  return `
+    <div class="card">
+      <div class="row between" style="gap:12px">
+        <div class="row" style="flex:1">
+          <div class="field" style="min-width:240px; max-width:420px">
+            <label>เลือกรอบเลี้ยง</label>
+            <select id="cycleSelect">${options}</select>
+          </div>
+          <div class="tag">เริ่มเลี้ยง: <b>${escapeHtml(cycle.startDate)}</b></div>
+          <div class="tag">ลูกกบเริ่มต้น: <b>${money(cycle.initialCount)}</b> ตัว</div>
+        </div>
+        <div class="row end">
+          <button id="btnNewCycle">➕ สร้างรอบใหม่</button>
+          <button class="danger" id="btnDeleteCycle">🗑️ ลบรอบนี้</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function viewDashboard(cycle){
+  const costs = sumCosts(cycle);
+  const sales = sumSales(cycle);
+  const ds = deathStats(cycle);
+  const profit = sales.net - costs.total;
+  const perSurvivor = ds.remain>0 ? costs.total / ds.remain : 0;
+
+  return `
+    ${headerCycleBar(cycle)}
+    <div class="grid cols4" style="margin-top:14px">
+      <div class="kpi">
+        <div class="label">คงเหลือ (ตัว)</div>
+        <div class="value">${money(ds.remain)}</div>
+        <div class="sub">จากเริ่มต้น ${money(ds.init)} • ตายสะสม ${money(ds.deathsTotal)}</div>
+      </div>
+      <div class="kpi">
+        <div class="label">อัตรารอด</div>
+        <div class="value">${pct(ds.survival)}</div>
+        <div class="sub">คำนวณจาก “ตายสะสม”</div>
+      </div>
+      <div class="kpi">
+        <div class="label">ต้นทุนรวม (บาท)</div>
+        <div class="value">${money(costs.total)}</div>
+        <div class="sub">ลูกกบ+อาหาร+เสริม+น้ำ+กระชัง</div>
+      </div>
+      <div class="kpi">
+        <div class="label">กำไรสุทธิ (บาท)</div>
+        <div class="value ${profit<0?'dangerText':''}">${money(profit)}</div>
+        <div class="sub">รายได้สุทธิ ${money(sales.net)} • ต้นทุน ${money(costs.total)}</div>
+      </div>
+    </div>
+
+    <div class="grid cols2" style="margin-top:14px">
+      <div class="card">
+        <div class="row between">
+          <h2 style="margin:0">📈 กราฟตายรายวัน</h2>
+          <span class="tag warn">แสดง 60 วันล่าสุด</span>
+        </div>
+        <div class="hint">ถ้ายังไม่มีข้อมูล ให้ไปที่ “บันทึกรายวัน” แล้วใส่จำนวนตายแต่ละวัน</div>
+        <div class="sep"></div>
+        <canvas id="chartDeaths"></canvas>
+      </div>
+      <div class="card">
+        <div class="row between">
+          <h2 style="margin:0">💰 กราฟเงินสะสม</h2>
+          <span class="tag ok">ต้นทุนสะสม vs รายได้สุทธิสะสม</span>
+        </div>
+        <div class="hint">ช่วยดูภาพรวมว่าเริ่ม “คุ้มทุน” วันไหน (ถ้ามีการทยอยขาย)</div>
+        <div class="sep"></div>
+        <canvas id="chartMoney"></canvas>
+      </div>
+    </div>
+
+    <div class="grid cols3" style="margin-top:14px">
+      <div class="card">
+        <h3>🧮 ตัวเลขสำคัญ</h3>
+        <div class="sep"></div>
+        <div class="row between"><span class="muted">ต้นทุน/ตัว (เฉพาะตัวที่ยังรอด)</span><b>${money(perSurvivor)}</b></div>
+        <div class="row between"><span class="muted">รายได้รวม (ก่อนหักค่าใช้จ่ายขาย)</span><b>${money(sales.total)}</b></div>
+        <div class="row between"><span class="muted">ค่าใช้จ่ายขายรวม</span><b>${money(sales.fees)}</b></div>
+        <div class="row between"><span class="muted">รายได้สุทธิ</span><b>${money(sales.net)}</b></div>
+      </div>
+      <div class="card">
+        <h3>📦 ต้นทุนแยกหมวด</h3>
+        <div class="sep"></div>
+        <div class="row between"><span class="muted">ลูกกบ</span><b>${money(costs.tad)}</b></div>
+        <div class="row between"><span class="muted">อาหาร (เล็ก/กลาง/ใหญ่)</span><b>${money(costs.feed)}</b></div>
+        <div class="row between"><span class="muted">อาหารเสริม</span><b>${money(costs.sup)}</b></div>
+        <div class="row between"><span class="muted">ค่าน้ำ</span><b>${money(costs.water)}</b></div>
+        <div class="row between"><span class="muted">กระชัง/อุปกรณ์</span><b>${money(costs.cages)}</b></div>
+      </div>
+      <div class="card">
+        <h3>✅ เช็คลิสต์การทยอยขาย</h3>
+        <div class="sep"></div>
+        <div class="hint">
+          1) ตั้ง “ตารางราคาขาย” ในแท็บ <b>ราคาขาย</b><br>
+          2) บันทึกขายแต่ละครั้งในแท็บ <b>การขาย</b><br>
+          3) กลับมาดูกราฟ “เงินสะสม” เพื่อดูจังหวะคุ้มทุน
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function renderDashboardCharts(cycle, cDeaths, cMoney){
+  // Deaths last 60 days
+  const deaths = [...cycle.deaths].sort(sortByDate);
+  const today = new Date();
+  const daysBack = 60;
+  const dates = [];
+  for(let i=daysBack-1; i>=0; i--){
+    const d = new Date(today);
+    d.setDate(today.getDate()-i);
+    dates.push(d.toISOString().slice(0,10));
+  }
+  const deathMap = new Map(deaths.map(x=>[x.date, toNum(x.count)]));
+  const deathPts = dates.map(d=>({x:d, y: deathMap.get(d) ?? 0}));
+  drawLineChart(cDeaths, [{name:'ตาย/วัน', points: deathPts}]);
+
+  // Money cumulative: cost cumulative vs net revenue cumulative
+  // Build by date for last 90 days (or available range)
+  const allDates = new Set();
+  cycle.feed.forEach(x=>allDates.add(x.date));
+  cycle.supplements.forEach(x=>allDates.add(x.date));
+  cycle.water.forEach(x=>allDates.add(x.date));
+  cycle.deaths.forEach(x=>allDates.add(x.date));
+  cycle.sales.forEach(x=>allDates.add(x.date));
+  // also include tadpoles and cages by date
+  if(cycle.tadpoles?.date) allDates.add(cycle.tadpoles.date);
+  cycle.cages.forEach(x=>allDates.add(x.date));
+
+  const sortedDates = Array.from(allDates).sort();
+  const lastN = sortedDates.slice(-90);
+  const dateSeq = lastN.length ? lastN : dates; // fallback last 60 if no date at all
+
+  // cumulative sums by date
+  let cumCost = 0, cumNet = 0;
+  const costPts = [];
+  const netPts = [];
+
+  // Pre-group per date
+  const costByDate = new Map();
+  function addCost(d, v){ costByDate.set(d, (costByDate.get(d)??0) + toNum(v)); }
+  addCost(cycle.tadpoles.date, toNum(cycle.tadpoles.totalCost) + toNum(cycle.tadpoles.transportCost));
+  cycle.feed.forEach(x=> addCost(x.date, x.cost));
+  cycle.supplements.forEach(x=> addCost(x.date, x.cost));
+  cycle.water.forEach(x=> addCost(x.date, x.cost));
+  cycle.cages.forEach(x=>{
+    const price = toNum(x.price);
+    const v = (x.mode==='amortize') ? price / Math.max(1,toNum(x.cyclesUseful)) : price;
+    addCost(x.date, v);
+  });
+  const netByDate = new Map();
+  cycle.sales.forEach(x=> netByDate.set(x.date, (netByDate.get(x.date)??0) + toNum(x.net)));
+
+  dateSeq.forEach(d=>{
+    cumCost += (costByDate.get(d)??0);
+    cumNet += (netByDate.get(d)??0);
+    costPts.push({x:d, y:cumCost});
+    netPts.push({x:d, y:cumNet});
+  });
+  drawLineChart(cMoney, [
+    {name:'ต้นทุนสะสม', points: costPts},
+    {name:'รายได้สุทธิสะสม', points: netPts},
+  ]);
+}
+
+function viewDaily(cycle){
+  const ds = deathStats(cycle);
+  const last = [...cycle.deaths].sort(sortByDate).slice(-8).reverse();
+  const rows = last.map(x=>`
+    <tr>
+      <td>${escapeHtml(x.date)}</td>
+      <td>${money(x.count)}</td>
+      <td>${escapeHtml(x.cause||'')}</td>
+      <td>${escapeHtml(x.note||'')}</td>
+      <td class="row end">
+        <button class="danger" data-del="death" data-id="${x.id}">ลบ</button>
+      </td>
+    </tr>
+  `).join('');
+
+  return `
+    ${headerCycleBar(cycle)}
+    <div class="grid cols2" style="margin-top:14px">
+      <div class="card">
+        <h2>🗓️ บันทึกการตายรายวัน</h2>
+        <div class="hint">ตัวเลข “คงเหลือ/อัตรารอด” จะคำนวณจากข้อมูลตายสะสม</div>
+        <div class="sep"></div>
+
+        <div class="row">
+          <div class="field" style="min-width:180px">
+            <label>วันที่</label>
+            <input type="date" id="deathDate" value="${escapeAttr(nowISODate())}">
+          </div>
+          <div class="field">
+            <label>ตายวันนี้ (ตัว)</label>
+            <input type="number" id="deathCount" min="0" step="1" placeholder="0">
+          </div>
+          <div class="field">
+            <label>สาเหตุ (เลือก/พิมพ์เอง)</label>
+            <input type="text" id="deathCause" placeholder="เช่น น้ำเสีย/โรค/อากาศ/อื่นๆ">
+          </div>
+        </div>
+        <div class="field" style="margin-top:10px">
+          <label>หมายเหตุ</label>
+          <textarea id="deathNote" placeholder="รายละเอียดเพิ่มเติม..."></textarea>
+        </div>
+        <div class="row end" style="margin-top:10px">
+          <button class="primary" id="btnAddDeath">➕ เพิ่มรายการ</button>
+        </div>
+
+        <div class="sep"></div>
+        <div class="row between">
+          <div class="tag">เริ่มต้น: <b>${money(ds.init)}</b> ตัว</div>
+          <div class="tag bad">ตายสะสม: <b>${money(ds.deathsTotal)}</b> ตัว</div>
+          <div class="tag ok">คงเหลือ: <b>${money(ds.remain)}</b> ตัว</div>
+          <div class="tag warn">อัตรารอด: <b>${pct(ds.survival)}</b></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🧾 รายการตายล่าสุด</h2>
+        <div class="hint">แสดงล่าสุด 8 รายการ (ลบได้)</div>
+        <div class="sep"></div>
+        <table class="table">
+          <thead>
+            <tr><th>วันที่</th><th>ตาย</th><th>สาเหตุ</th><th>หมายเหตุ</th><th></th></tr>
+          </thead>
+          <tbody>
+            ${rows || `<tr><td colspan="5" class="muted">ยังไม่มีข้อมูล</td></tr>`}
+          </tbody>
+        </table>
+
+        <div class="sep"></div>
+        <h3>🍽️ ช็อตคัตไปบันทึกต้นทุน</h3>
+        <div class="hint">อาหาร/เสริม/น้ำ/กระชัง ไปที่แท็บ <b>ต้นทุน</b> ได้เลย</div>
+        <div class="row end" style="margin-top:10px">
+          <button id="goCosts">ไปที่ต้นทุน ➜</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function viewCosts(cycle){
+  const costs = sumCosts(cycle);
+
+  const feedRows = [...cycle.feed].sort(sortByDate).slice(-10).reverse().map(x=>`
+    <tr>
+      <td>${escapeHtml(x.date)}</td>
+      <td>${escapeHtml(sizeLabel(x.size))}</td>
+      <td>${kg(x.kg)}</td>
+      <td>${money(x.cost)}</td>
+      <td>${escapeHtml(x.note||'')}</td>
+      <td class="row end"><button class="danger" data-del="feed" data-id="${x.id}">ลบ</button></td>
+    </tr>
+  `).join('');
+
+  const supRows = [...cycle.supplements].sort(sortByDate).slice(-10).reverse().map(x=>`
+    <tr>
+      <td>${escapeHtml(x.date)}</td>
+      <td>${escapeHtml(x.name)}</td>
+      <td>${escapeHtml(x.qty||'')}</td>
+      <td>${money(x.cost)}</td>
+      <td>${escapeHtml(x.note||'')}</td>
+      <td class="row end"><button class="danger" data-del="sup" data-id="${x.id}">ลบ</button></td>
+    </tr>
+  `).join('');
+
+  const waterRows = [...cycle.water].sort(sortByDate).slice(-10).reverse().map(x=>`
+    <tr>
+      <td>${escapeHtml(x.date)}</td>
+      <td>${escapeHtml(x.volume||'')}</td>
+      <td>${escapeHtml(x.unit||'')}</td>
+      <td>${money(x.cost)}</td>
+      <td>${escapeHtml(x.note||'')}</td>
+      <td class="row end"><button class="danger" data-del="water" data-id="${x.id}">ลบ</button></td>
+    </tr>
+  `).join('');
+
+  const cageRows = [...cycle.cages].sort(sortByDate).slice(-10).reverse().map(x=>`
+    <tr>
+      <td>${escapeHtml(x.date)}</td>
+      <td>${escapeHtml(x.name)}</td>
+      <td>${money(x.price)}</td>
+      <td>${x.mode==='amortize' ? `เฉลี่ย/${money(x.cyclesUseful)} รอบ` : 'คิดเต็ม'}</td>
+      <td>${money(cageCostInCycle(x))}</td>
+      <td>${escapeHtml(x.note||'')}</td>
+      <td class="row end"><button class="danger" data-del="cage" data-id="${x.id}">ลบ</button></td>
+    </tr>
+  `).join('');
+
+  return `
+    ${headerCycleBar(cycle)}
+    <div class="grid cols3" style="margin-top:14px">
+      <div class="kpi"><div class="label">ลูกกบ</div><div class="value">${money(costs.tad)}</div><div class="sub">รวมค่าขนส่งแล้ว</div></div>
+      <div class="kpi"><div class="label">อาหารรวม</div><div class="value">${money(costs.feed)}</div><div class="sub">เล็ก+กลาง+ใหญ่</div></div>
+      <div class="kpi"><div class="label">ต้นทุนรวมทั้งหมด</div><div class="value">${money(costs.total)}</div><div class="sub">รวมทุกหมวด</div></div>
+    </div>
+
+    <div class="grid cols2" style="margin-top:14px">
+      <div class="card">
+        <h2>🐣 ต้นทุนลูกกบ</h2>
+        <div class="sep"></div>
+        <div class="row">
+          <div class="field"><label>วันที่ซื้อ</label><input type="date" id="tadDate" value="${escapeAttr(cycle.tadpoles.date||nowISODate())}"></div>
+          <div class="field"><label>จำนวน (ตัว)</label><input type="number" id="tadCount" min="0" step="1" value="${escapeAttr(cycle.tadpoles.count||0)}"></div>
+          <div class="field"><label>ราคารวม (บาท)</label><input type="number" id="tadCost" min="0" step="0.01" value="${escapeAttr(cycle.tadpoles.totalCost||0)}"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>ค่าขนส่ง (บาท)</label><input type="number" id="tadTransport" min="0" step="0.01" value="${escapeAttr(cycle.tadpoles.transportCost||0)}"></div>
+          <div class="field"><label>แหล่งซื้อ/ฟาร์ม</label><input type="text" id="tadVendor" value="${escapeAttr(cycle.tadpoles.vendor||'')}"></div>
+        </div>
+        <div class="row end" style="margin-top:10px">
+          <button class="primary" id="btnSaveTad">💾 บันทึกลูกกบ</button>
+        </div>
+        <div class="hint">* ระบบคิดต้นทุนลูกกบ = ราคารวม + ค่าขนส่ง</div>
+      </div>
+
+      <div class="card">
+        <h2>🍽️ เพิ่มต้นทุนอาหาร (เล็ก/กลาง/ใหญ่)</h2>
+        <div class="sep"></div>
+        <div class="row">
+          <div class="field" style="min-width:180px"><label>วันที่</label><input type="date" id="feedDate" value="${escapeAttr(nowISODate())}"></div>
+          <div class="field"><label>ขนาดอาหาร</label>
+            <select id="feedSize">
+              <option value="S">เล็ก</option>
+              <option value="M">กลาง</option>
+              <option value="L">ใหญ่</option>
+            </select>
+          </div>
+          <div class="field"><label>ปริมาณ (kg)</label><input type="number" id="feedKg" min="0" step="0.001" placeholder="เช่น 25"></div>
+          <div class="field"><label>ราคารวม (บาท)</label><input type="number" id="feedCost" min="0" step="0.01" placeholder="เช่น 1200"></div>
+        </div>
+        <div class="field"><label>หมายเหตุ</label><input type="text" id="feedNote" placeholder="เช่น ถุง 25kg ยี่ห้อ..."></div>
+        <div class="row end" style="margin-top:10px"><button class="primary" id="btnAddFeed">➕ เพิ่มอาหาร</button></div>
+
+        <div class="sep"></div>
+        <h3>อาหารล่าสุด</h3>
+        <table class="table">
+          <thead><tr><th>วันที่</th><th>ขนาด</th><th>kg</th><th>บาท</th><th>หมายเหตุ</th><th></th></tr></thead>
+          <tbody>${feedRows || `<tr><td colspan="6" class="muted">ยังไม่มีข้อมูล</td></tr>`}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="grid cols2" style="margin-top:14px">
+      <div class="card">
+        <h2>💊 อาหารเสริม (เพิ่มเองได้)</h2>
+        <div class="sep"></div>
+        <div class="row">
+          <div class="field" style="min-width:180px"><label>วันที่</label><input type="date" id="supDate" value="${escapeAttr(nowISODate())}"></div>
+          <div class="field"><label>ชื่อรายการ</label><input type="text" id="supName" placeholder="เช่น วิตามิน/ยา/เกลือ"></div>
+          <div class="field"><label>ปริมาณ/หน่วย</label><input type="text" id="supQty" placeholder="เช่น 1 ขวด / 500g"></div>
+          <div class="field"><label>ราคา (บาท)</label><input type="number" id="supCost" min="0" step="0.01"></div>
+        </div>
+        <div class="field"><label>หมายเหตุ</label><input type="text" id="supNote" placeholder="เช่น ใช้ช่วงฝน/ป้องกันโรค..."></div>
+        <div class="row end" style="margin-top:10px"><button class="primary" id="btnAddSup">➕ เพิ่มเสริม</button></div>
+
+        <div class="sep"></div>
+        <h3>เสริมล่าสุด</h3>
+        <table class="table">
+          <thead><tr><th>วันที่</th><th>รายการ</th><th>ปริมาณ</th><th>บาท</th><th>หมายเหตุ</th><th></th></tr></thead>
+          <tbody>${supRows || `<tr><td colspan="6" class="muted">ยังไม่มีข้อมูล</td></tr>`}</tbody>
+        </table>
+      </div>
+
+      <div class="card">
+        <h2>🚰 ค่าน้ำ</h2>
+        <div class="sep"></div>
+        <div class="row">
+          <div class="field" style="min-width:180px"><label>วันที่</label><input type="date" id="waterDate" value="${escapeAttr(nowISODate())}"></div>
+          <div class="field"><label>ปริมาณ</label><input type="number" id="waterVol" min="0" step="0.001" placeholder="เช่น 2.5"></div>
+          <div class="field"><label>หน่วย</label>
+            <select id="waterUnit">
+              <option value="m3">คิว (m³)</option>
+              <option value="L">ลิตร (L)</option>
+              <option value="other">อื่นๆ</option>
+            </select>
+          </div>
+          <div class="field"><label>ราคา (บาท)</label><input type="number" id="waterCost" min="0" step="0.01"></div>
+        </div>
+        <div class="field"><label>หมายเหตุ</label><input type="text" id="waterNote" placeholder="เช่น ค่าน้ำประปา/ค่าน้ำขน"></div>
+        <div class="row end" style="margin-top:10px"><button class="primary" id="btnAddWater">➕ เพิ่มค่าน้ำ</button></div>
+
+        <div class="sep"></div>
+        <h3>ค่าน้ำล่าสุด</h3>
+        <table class="table">
+          <thead><tr><th>วันที่</th><th>ปริมาณ</th><th>หน่วย</th><th>บาท</th><th>หมายเหตุ</th><th></th></tr></thead>
+          <tbody>${waterRows || `<tr><td colspan="6" class="muted">ยังไม่มีข้อมูล</td></tr>`}</tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card" style="margin-top:14px">
+      <div class="row between">
+        <h2 style="margin:0">🧺 ค่ากระชัง/อุปกรณ์ (คิดเต็มหรือเฉลี่ยต่อรอบ)</h2>
+        <span class="tag">ถ้าเลือก “เฉลี่ย” ระบบจะเอา (ราคา ÷ จำนวนรอบ)</span>
+      </div>
+      <div class="sep"></div>
+      <div class="row">
+        <div class="field" style="min-width:180px"><label>วันที่ซื้อ</label><input type="date" id="cageDate" value="${escapeAttr(nowISODate())}"></div>
+        <div class="field"><label>ชื่ออุปกรณ์</label><input type="text" id="cageName" placeholder="เช่น กระชัง/แห/ปั๊ม"></div>
+        <div class="field"><label>ราคา (บาท)</label><input type="number" id="cagePrice" min="0" step="0.01"></div>
+        <div class="field"><label>วิธีคิด</label>
+          <select id="cageMode">
+            <option value="amortize">เฉลี่ยต่อรอบ</option>
+            <option value="full">คิดเต็มในรอบนี้</option>
+          </select>
+        </div>
+        <div class="field"><label>จำนวนรอบที่ใช้ได้ (ถ้าเฉลี่ย)</label><input type="number" id="cageCycles" min="1" step="1" value="10"></div>
+      </div>
+      <div class="field"><label>หมายเหตุ</label><input type="text" id="cageNote" placeholder="เช่น ซื้อใหม่/ซ่อม/เปลี่ยนตาข่าย"></div>
+      <div class="row end" style="margin-top:10px"><button class="primary" id="btnAddCage">➕ เพิ่มอุปกรณ์</button></div>
+
+      <div class="sep"></div>
+      <h3>อุปกรณ์ล่าสุด</h3>
+      <table class="table">
+        <thead><tr><th>วันที่</th><th>รายการ</th><th>ราคา</th><th>วิธีคิด</th><th>คิดเป็นต้นทุนรอบนี้</th><th>หมายเหตุ</th><th></th></tr></thead>
+        <tbody>${cageRows || `<tr><td colspan="7" class="muted">ยังไม่มีข้อมูล</td></tr>`}</tbody>
+      </table>
+    </div>
+  `;
+}
+
+function viewPrices(cycle){
+  const rows = [...cycle.priceTiers].sort((a,b)=>toNum(a.minKg)-toNum(b.minKg)).map(t=>{
+    const max = (t.maxKg===null || t.maxKg===undefined || t.maxKg==='') ? '∞' : t.maxKg;
+    return `
+      <tr>
+        <td>${money(t.minKg)}</td>
+        <td>${escapeHtml(String(max))}</td>
+        <td>${money(t.pricePerKg)}</td>
+        <td class="row end">
+          <button class="danger" data-del="tier" data-id="${t.id}">ลบ</button>
+        </td>
+      </tr>
+    `;
+  }).join('');
+  return `
+    ${headerCycleBar(cycle)}
+    <div class="grid cols2" style="margin-top:14px">
+      <div class="card">
+        <h2>🏷️ ตารางราคาขาย (ตามน้ำหนักที่ขายในครั้งนั้น)</h2>
+        <div class="hint">
+          ใช้กับ “ทยอยขาย” ได้เลย: ขายแต่ละครั้งใส่น้ำหนัก → ระบบหา “ช่วงราคา” ให้อัตโนมัติ<br>
+          ถ้าต้องการขายครั้งเดียวแต่ “หลายช่วง” ให้แยกเป็นหลายบรรทัดในแท็บการขาย
+        </div>
+        <div class="sep"></div>
+        <div class="row">
+          <div class="field"><label>ขั้นต่ำ (kg)</label><input type="number" id="tierMin" min="0" step="0.001" placeholder="เช่น 1"></div>
+          <div class="field"><label>ขั้นสูงสุด (kg) (เว้นว่าง = ขึ้นไป)</label><input type="number" id="tierMax" min="0" step="0.001" placeholder="เช่น 3"></div>
+          <div class="field"><label>ราคา/kg (บาท)</label><input type="number" id="tierPrice" min="0" step="0.01" placeholder="เช่น 100"></div>
+        </div>
+        <div class="row end" style="margin-top:10px">
+          <button class="primary" id="btnAddTier">➕ เพิ่มช่วงราคา</button>
+        </div>
+        <div class="sep"></div>
+        <div class="tag">ตัวอย่าง: 1-3kg=100, 4-5kg=90, 6kg++=80</div>
+      </div>
+
+      <div class="card">
+        <h2>📋 รายการช่วงราคา</h2>
+        <div class="sep"></div>
+        <table class="table">
+          <thead><tr><th>min kg</th><th>max kg</th><th>บาท/kg</th><th></th></tr></thead>
+          <tbody>${rows || `<tr><td colspan="4" class="muted">ยังไม่มีช่วงราคา</td></tr>`}</tbody>
+        </table>
+
+        <div class="sep"></div>
+        <h3>🧪 ทดลองคำนวณราคาอัตโนมัติ</h3>
+        <div class="row">
+          <div class="field"><label>ใส่น้ำหนักที่ขาย (kg)</label><input type="number" id="testKg" min="0" step="0.001" placeholder="เช่น 4.2"></div>
+          <div class="field"><label>ราคา/kg ที่ระบบเลือก</label><input type="text" id="testPrice" readonly></div>
+        </div>
+        <div class="row end">
+          <button id="btnTestTier">คำนวณ</button>
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+function viewSales(cycle){
+  const salesSorted = [...cycle.sales].sort(sortByDate).reverse();
+  const rows = salesSorted.slice(0,12).map(x=>`
+    <tr>
+      <td>${escapeHtml(x.date)}</td>
+      <td>${kg(x.soldKg)}</td>
+      <td>${money(x.pricePerKg)}</td>
+      <td>${money(x.total)}</td>
+      <td>${money(x.fee)}</td>
+      <td><b>${money(x.net)}</b></td>
+      <td>${escapeHtml(x.note||'')}</td>
+      <td class="row end"><button class="danger" data-del="sale" data-id="${x.id}">ลบ</button></td>
+    </tr>
+  `).join('');
+
+  const sums = sumSales(cycle);
+  const costs = sumCosts(cycle);
+  const profit = sums.net - costs.total;
+
+  return `
+    ${headerCycleBar(cycle)}
+    <div class="grid cols3" style="margin-top:14px">
+      <div class="kpi"><div class="label">รายได้สุทธิสะสม</div><div class="value">${money(sums.net)}</div><div class="sub">หลังหักค่าใช้จ่ายขาย</div></div>
+      <div class="kpi"><div class="label">ต้นทุนรวม</div><div class="value">${money(costs.total)}</div><div class="sub">รวมทุกหมวด</div></div>
+      <div class="kpi"><div class="label">กำไรสุทธิ</div><div class="value ${profit<0?'dangerText':''}">${money(profit)}</div><div class="sub">สุทธิ = รายได้สุทธิ - ต้นทุนรวม</div></div>
+    </div>
+
+    <div class="grid cols2" style="margin-top:14px">
+      <div class="card">
+        <h2>🧾 เพิ่มบันทึกขาย (ทยอยขาย)</h2>
+        <div class="hint">ระบบจะเลือก “ราคา/kg” จากตารางช่วงราคาที่แท็บ <b>ราคาขาย</b> ให้เอง (เปิด auto ได้)</div>
+        <div class="sep"></div>
+
+        <div class="row">
+          <div class="field" style="min-width:180px"><label>วันที่ขาย</label><input type="date" id="saleDate" value="${escapeAttr(nowISODate())}"></div>
+          <div class="field"><label>น้ำหนักที่ขาย (kg)</label><input type="number" id="saleKg" min="0" step="0.001" placeholder="เช่น 4.5"></div>
+          <div class="field"><label>Auto ราคา/kg จากช่วง</label>
+            <select id="saleAuto">
+              <option value="true" selected>เปิด</option>
+              <option value="false">ปิด (ใส่เอง)</option>
+            </select>
+          </div>
+          <div class="field"><label>ราคา/kg (บาท)</label><input type="number" id="salePrice" min="0" step="0.01" placeholder="ระบบจะใส่ให้"></div>
+        </div>
+
+        <div class="row">
+          <div class="field"><label>ค่าใช้จ่ายขาย (บาท)</label><input type="number" id="saleFee" min="0" step="0.01" placeholder="เช่น ค่าขนส่ง/ค่าตลาด"></div>
+          <div class="field"><label>หมายเหตุ</label><input type="text" id="saleNote" placeholder="เช่น ร้าน A / ล็อตแรก"></div>
+        </div>
+
+        <div class="row end" style="margin-top:10px">
+          <button class="primary" id="btnAddSale">➕ เพิ่มรายการขาย</button>
+        </div>
+
+        <div class="sep"></div>
+        <div class="hint">
+          💡 ถ้าขาย “ครั้งเดียวหลายช่วงราคา” ให้แยกเป็นหลายรายการขายในวันเดียวกัน เช่น<br>
+          - 3kg (ช่วง 1-3) + 2kg (ช่วง 4-5) → ใส่ 2 แถว
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>📋 รายการขายล่าสุด</h2>
+        <div class="hint">แสดงล่าสุด 12 รายการ</div>
+        <div class="sep"></div>
+        <table class="table">
+          <thead>
+            <tr><th>วันที่</th><th>kg</th><th>บาท/kg</th><th>รวม</th><th>หัก</th><th>สุทธิ</th><th>หมายเหตุ</th><th></th></tr>
+          </thead>
+          <tbody>${rows || `<tr><td colspan="8" class="muted">ยังไม่มีการขาย</td></tr>`}</tbody>
+        </table>
+      </div>
+    </div>
+  `;
+}
+
+function viewBackup(cycle){
+  return `
+    ${headerCycleBar(cycle)}
+    <div class="grid cols2" style="margin-top:14px">
+      <div class="card">
+        <h2>🔒 สำรอง/นำเข้า/ส่งออก (ไฟล์ออฟไลน์)</h2>
+        <div class="hint">
+          ถ้าใช้ Chrome/Edge บน Android/Windows จะ “เชื่อมไฟล์” แล้วบันทึกลงไฟล์ได้ง่ายขึ้น<br>
+          ถ้าไม่รองรับ ก็ใช้ Export/Import ได้เหมือนกัน (ข้อมูลยังเป็นส่วนตัวอยู่กับเครื่อง)
+        </div>
+        <div class="sep"></div>
+        <div class="row">
+          <button class="primary" id="btnConnectFile">🔗 เชื่อมไฟล์เดิม</button>
+          <button id="btnCreateFile">🆕 สร้างไฟล์ใหม่</button>
+        </div>
+        <div class="row" style="margin-top:10px">
+          <button class="primary" id="btnExport">⬇️ Export (ดาวน์โหลด JSON)</button>
+          <label class="btn" style="display:inline-flex; align-items:center; gap:8px">
+            ⬆️ Import (เลือกไฟล์ JSON)
+            <input id="importFile" type="file" accept=".json,application/json" style="display:none">
+          </label>
+        </div>
+
+        <div class="sep"></div>
+        <div class="row between">
+          <div class="field">
+            <label>Auto-save ลงไฟล์ (ต้องเชื่อมไฟล์ก่อน)</label>
+            <select id="autosaveToggle">
+              <option value="false" ${state.data.settings.autosaveToFile ? '' : 'selected'}>ปิด</option>
+              <option value="true" ${state.data.settings.autosaveToFile ? 'selected' : ''}>เปิด</option>
+            </select>
+          </div>
+          <div class="tag">${supportsFSAccess() ? 'เบราว์เซอร์รองรับเชื่อมไฟล์ ✅' : 'เบราว์เซอร์ไม่รองรับเชื่อมไฟล์ ⚠️'}</div>
+        </div>
+
+        <div class="sep"></div>
+        <div class="hint">
+          ✅ แนะนำ: สร้างโฟลเดอร์ <b>FrogFarm</b> ในเครื่อง แล้วเก็บไฟล์ JSON ไว้ในนั้น (ส่วนตัว)<br>
+          ✅ ถ้าจะอัป GitHub Pages ให้อัปเฉพาะไฟล์เว็บ (index.html) เท่านั้น ไม่ต้องเอาไฟล์ข้อมูลขึ้นไป
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🧯 รีเซ็ต/เครื่องมือ</h2>
+        <div class="sep"></div>
+        <div class="hint">ระวัง: รีเซ็ตจะล้างข้อมูลในแอป (แต่ไฟล์ JSON ที่ Export ไว้ยังอยู่)</div>
+        <div class="row" style="margin-top:10px">
+          <button class="danger" id="btnReset">♻️ รีเซ็ตข้อมูลทั้งหมด</button>
+          <button id="btnCopyData">📋 คัดลอก JSON ไปคลิปบอร์ด</button>
+        </div>
+
+        <div class="sep"></div>
+        <h3>ข้อมูลดิบ (อ่านอย่างเดียว)</h3>
+        <textarea class="mono" readonly id="rawJson" style="min-height:320px">${escapeHtml(JSON.stringify(state.data, null, 2))}</textarea>
+      </div>
+    </div>
+  `;
+}
+
+function viewSettings(cycle){
+  return `
+    ${headerCycleBar(cycle)}
+    <div class="grid cols2" style="margin-top:14px">
+      <div class="card">
+        <h2>⚙️ ตั้งค่าฟาร์ม/เจ้าของ</h2>
+        <div class="sep"></div>
+        <div class="row">
+          <div class="field"><label>ชื่อฟาร์ม</label><input type="text" id="metaFarm" value="${escapeAttr(state.data.meta.farmName||'')}"></div>
+          <div class="field"><label>เจ้าของ</label><input type="text" id="metaOwner" value="${escapeAttr(state.data.meta.owner||'')}"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>สกุลเงิน</label>
+            <select id="metaCurrency">
+              <option value="THB" ${state.data.meta.currency==='THB'?'selected':''}>THB</option>
+              <option value="LAK" ${state.data.meta.currency==='LAK'?'selected':''}>LAK</option>
+              <option value="KHR" ${state.data.meta.currency==='KHR'?'selected':''}>KHR</option>
+              <option value="USD" ${state.data.meta.currency==='USD'?'selected':''}>USD</option>
+            </select>
+          </div>
+        </div>
+        <div class="row end" style="margin-top:10px">
+          <button class="primary" id="btnSaveMeta">💾 บันทึกตั้งค่า</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>🐸 ตั้งค่ารอบเลี้ยง</h2>
+        <div class="sep"></div>
+        <div class="row">
+          <div class="field"><label>ชื่อรอบเลี้ยง</label><input type="text" id="cycleName" value="${escapeAttr(cycle.name||'')}"></div>
+          <div class="field"><label>วันที่เริ่มเลี้ยง</label><input type="date" id="cycleStart" value="${escapeAttr(cycle.startDate||nowISODate())}"></div>
+        </div>
+        <div class="row">
+          <div class="field"><label>จำนวนลูกกบเริ่มต้น (ตัว)</label><input type="number" id="cycleInit" min="0" step="1" value="${escapeAttr(cycle.initialCount||0)}"></div>
+          <div class="field"><label>หมายเหตุ</label><input type="text" id="cycleNotes" value="${escapeAttr(cycle.notes||'')}"></div>
+        </div>
+        <div class="row end" style="margin-top:10px">
+          <button class="primary" id="btnSaveCycle">💾 บันทึกรอบเลี้ยง</button>
+        </div>
+
+        <div class="sep"></div>
+        <div class="hint">
+          * ถ้าเปลี่ยน “จำนวนเริ่มต้น” ระบบจะคำนวณคงเหลือใหม่ตามตายสะสม<br>
+          * การขายแบบทยอยขายจะไม่กระทบจำนวนคงเหลือ (เวอร์ชันนี้คงเหลือคำนวณจากตายเท่านั้น)
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// ---------- Events binding per view ----------
+document.addEventListener('click', (ev)=>{
+  const t = ev.target;
+  if(!(t instanceof HTMLElement)) return;
+
+  // delete handlers
+  const del = t.closest('[data-del]');
+  if(del){
+    const kind = del.getAttribute('data-del');
+    const id = del.getAttribute('data-id');
+    if(!id) return;
+    if(!confirm('ลบรายการนี้?')) return;
+    const cycle = getActiveCycle();
+    if(kind==='death') cycle.deaths = cycle.deaths.filter(x=>x.id!==id);
+    if(kind==='feed') cycle.feed = cycle.feed.filter(x=>x.id!==id);
+    if(kind==='sup') cycle.supplements = cycle.supplements.filter(x=>x.id!==id);
+    if(kind==='water') cycle.water = cycle.water.filter(x=>x.id!==id);
+    if(kind==='cage') cycle.cages = cycle.cages.filter(x=>x.id!==id);
+    if(kind==='tier') cycle.priceTiers = cycle.priceTiers.filter(x=>x.id!==id);
+    if(kind==='sale') cycle.sales = cycle.sales.filter(x=>x.id!==id);
+    persistData();
+    toast('ลบแล้ว');
+    render();
+  }
+});
+
+// Input dependencies
+document.addEventListener('change', (ev)=>{
+  const cycle = getActiveCycle();
+  const saleKg = $('#saleKg');
+  const saleAuto = $('#saleAuto');
+  const salePrice = $('#salePrice');
+  if(saleKg && saleAuto && salePrice){
+    if(ev.target === saleKg || ev.target === saleAuto){
+      const auto = (saleAuto.value === 'true');
+      if(auto){
+        const p = inferTierPrice(cycle, saleKg.value);
+        salePrice.value = p ? String(p) : '';
+      }
+    }
+  }
+});
+
+function persistData(){
+  state.data.meta.updatedAt = new Date().toISOString();
+  idbSet('data', state.data).catch(console.warn);
+  maybeAutoSaveToFile();
+}
+
+// ---------- Helpers for costs ----------
+function sizeLabel(s){
+  return s==='S' ? 'เล็ก' : s==='M' ? 'กลาง' : 'ใหญ่';
+}
+function cageCostInCycle(x){
+  const price = toNum(x.price);
+  if(x.mode==='amortize'){
+    return price / Math.max(1, toNum(x.cyclesUseful));
+  }
+  return price;
+}
+
+// ---------- Escape helpers ----------
+function escapeHtml(str){
+  return String(str ?? '').replace(/[&<>"']/g, s=>({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[s]));
+}
+function escapeAttr(str){
+  return escapeHtml(str).replace(/"/g,'&quot;');
+}
+
+// ---------- Backup: Export/Import ----------
+function exportJSONDownload(){
+  const blob = new Blob([JSON.stringify(state.data, null, 2)], {type:'application/json'});
+  const a = document.createElement('a');
+  const stamp = new Date().toISOString().slice(0,10);
+  a.href = URL.createObjectURL(blob);
+  a.download = `frog_farm_backup_${stamp}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  setTimeout(()=> URL.revokeObjectURL(a.href), 2500);
+  toast('ดาวน์โหลดไฟล์สำรองแล้ว ⬇️');
+}
+
+// ---------- Bind view-specific after render ----------
+const _origRender = render;
+render = function(){
+  _origRender();
+  const cycle = getActiveCycle();
+
+  // Common navigation shortcuts
+  const goCosts = $('#goCosts'); if(goCosts) goCosts.onclick = ()=> setTab('costs');
+
+  // DAILY add death
+  const btnAddDeath = $('#btnAddDeath');
+  if(btnAddDeath){
+    btnAddDeath.onclick = ()=>{
+      const date = $('#deathDate').value || nowISODate();
+      const count = toNum($('#deathCount').value);
+      const cause = $('#deathCause').value || '';
+      const note = $('#deathNote').value || '';
+      if(count < 0){ toast('จำนวนตายต้องไม่ติดลบ'); return; }
+      cycle.deaths.push({id:uid(), date, count, cause, note});
+      cycle.deaths.sort(sortByDate);
+      $('#deathCount').value = '';
+      $('#deathCause').value = '';
+      $('#deathNote').value = '';
+      persistData();
+      toast('เพิ่มรายการตายแล้ว');
+      render();
+    };
+  }
+
+  // COSTS: save tadpoles
+  const btnSaveTad = $('#btnSaveTad');
+  if(btnSaveTad){
+    btnSaveTad.onclick = ()=>{
+      cycle.tadpoles.date = $('#tadDate').value || cycle.tadpoles.date || nowISODate();
+      cycle.tadpoles.count = toNum($('#tadCount').value);
+      cycle.tadpoles.totalCost = toNum($('#tadCost').value);
+      cycle.tadpoles.transportCost = toNum($('#tadTransport').value);
+      cycle.tadpoles.vendor = $('#tadVendor').value || '';
+      // Sync initial count optionally
+      // If user changed tadpoles count, update initialCount if still default or user wants; we won't force it.
+      persistData();
+      toast('บันทึกลูกกบแล้ว');
+      render();
+    };
+  }
+
+  // COSTS: add feed
+  const btnAddFeed = $('#btnAddFeed');
+  if(btnAddFeed){
+    btnAddFeed.onclick = ()=>{
+      const date = $('#feedDate').value || nowISODate();
+      const size = $('#feedSize').value;
+      const kgVal = toNum($('#feedKg').value);
+      const cost = toNum($('#feedCost').value);
+      const note = $('#feedNote').value || '';
+      if(kgVal<=0 || cost<=0){ toast('กรอก kg และราคาให้ถูกต้อง'); return; }
+      cycle.feed.push({id:uid(), date, size, kg:kgVal, cost, note});
+      cycle.feed.sort(sortByDate);
+      $('#feedKg').value=''; $('#feedCost').value=''; $('#feedNote').value='';
+      persistData();
+      toast('เพิ่มต้นทุนอาหารแล้ว');
+      render();
+    };
+  }
+
+  // COSTS: add supplement
+  const btnAddSup = $('#btnAddSup');
+  if(btnAddSup){
+    btnAddSup.onclick = ()=>{
+      const date = $('#supDate').value || nowISODate();
+      const name = ($('#supName').value||'').trim();
+      const qty = ($('#supQty').value||'').trim();
+      const cost = toNum($('#supCost').value);
+      const note = $('#supNote').value || '';
+      if(!name || cost<=0){ toast('กรอกชื่อรายการและราคา'); return; }
+      cycle.supplements.push({id:uid(), date, name, qty, cost, note});
+      cycle.supplements.sort(sortByDate);
+      $('#supName').value=''; $('#supQty').value=''; $('#supCost').value=''; $('#supNote').value='';
+      persistData();
+      toast('เพิ่มอาหารเสริมแล้ว');
+      render();
+    };
+  }
+
+  // COSTS: add water
+  const btnAddWater = $('#btnAddWater');
+  if(btnAddWater){
+    btnAddWater.onclick = ()=>{
+      const date = $('#waterDate').value || nowISODate();
+      const volume = $('#waterVol').value;
+      const unit = $('#waterUnit').value;
+      const cost = toNum($('#waterCost').value);
+      const note = $('#waterNote').value || '';
+      if(cost<=0){ toast('กรอกราคาให้ถูกต้อง'); return; }
+      cycle.water.push({id:uid(), date, volume, unit, cost, note});
+      cycle.water.sort(sortByDate);
+      $('#waterVol').value=''; $('#waterCost').value=''; $('#waterNote').value='';
+      persistData();
+      toast('เพิ่มค่าน้ำแล้ว');
+      render();
+    };
+  }
+
+  // COSTS: add cage
+  const btnAddCage = $('#btnAddCage');
+  if(btnAddCage){
+    btnAddCage.onclick = ()=>{
+      const date = $('#cageDate').value || nowISODate();
+      const name = ($('#cageName').value||'').trim();
+      const price = toNum($('#cagePrice').value);
+      const mode = $('#cageMode').value;
+      const cyclesUseful = toNum($('#cageCycles').value) || 10;
+      const note = $('#cageNote').value || '';
+      if(!name || price<=0){ toast('กรอกชื่ออุปกรณ์และราคา'); return; }
+      cycle.cages.push({id:uid(), date, name, price, mode, cyclesUseful, note});
+      cycle.cages.sort(sortByDate);
+      $('#cageName').value=''; $('#cagePrice').value=''; $('#cageNote').value='';
+      persistData();
+      toast('เพิ่มอุปกรณ์แล้ว');
+      render();
+    };
+  }
+
+  // PRICES: add tier + test
+  const btnAddTier = $('#btnAddTier');
+  if(btnAddTier){
+    btnAddTier.onclick = ()=>{
+      const minKg = toNum($('#tierMin').value);
+      const maxRaw = $('#tierMax').value;
+      const maxKg = (String(maxRaw).trim()==='') ? null : toNum(maxRaw);
+      const pricePerKg = toNum($('#tierPrice').value);
+      if(minKg<0 || pricePerKg<=0){ toast('กรอก min และ ราคา/kg'); return; }
+      cycle.priceTiers.push({id:uid(), minKg, maxKg, pricePerKg});
+      cycle.priceTiers.sort((a,b)=>toNum(a.minKg)-toNum(b.minKg));
+      $('#tierMin').value=''; $('#tierMax').value=''; $('#tierPrice').value='';
+      persistData();
+      toast('เพิ่มช่วงราคาแล้ว');
+      render();
+    };
+  }
+  const btnTestTier = $('#btnTestTier');
+  if(btnTestTier){
+    btnTestTier.onclick = ()=>{
+      const v = toNum($('#testKg').value);
+      const p = inferTierPrice(cycle, v);
+      $('#testPrice').value = p ? String(p) : '0';
+      toast('คำนวณแล้ว');
+    };
+  }
+
+  // SALES: add sale
+  const btnAddSale = $('#btnAddSale');
+  if(btnAddSale){
+    const saleAuto = $('#saleAuto');
+    const saleKg = $('#saleKg');
+    const salePrice = $('#salePrice');
+
+    // init autoprice
+    if(saleAuto && saleKg && saleAuto.value==='true'){
+      const p = inferTierPrice(cycle, saleKg.value);
+      if(p && (!salePrice.value || toNum(salePrice.value)===0)) salePrice.value = String(p);
+    }
+
+    btnAddSale.onclick = ()=>{
+      const date = $('#saleDate').value || nowISODate();
+      const soldKg = toNum($('#saleKg').value);
+      const autoTier = ($('#saleAuto').value === 'true');
+      const pricePerKg = toNum($('#salePrice').value);
+      const fee = toNum($('#saleFee').value);
+      const note = $('#saleNote').value || '';
+      if(soldKg<=0){ toast('กรอกน้ำหนักที่ขาย'); return; }
+      let sale = {id:uid(), date, soldKg, autoTier, pricePerKg, fee, note, total:0, net:0};
+      sale = recalcSale(cycle, sale);
+      // if autoTier and tiers empty -> still works but price=0
+      if(sale.pricePerKg<=0){ toast('ราคา/kg เป็น 0 (ตรวจสอบตารางราคา)'); }
+      cycle.sales.push(sale);
+      cycle.sales.sort(sortByDate);
+
+      $('#saleKg').value=''; $('#saleFee').value=''; $('#saleNote').value='';
+      // keep auto selection
+      persistData();
+      toast('เพิ่มรายการขายแล้ว');
+      render();
+    };
+  }
+
+  // BACKUP: connect file, create file, export, import, reset, copy
+  const btnConnectFile = $('#btnConnectFile');
+  if(btnConnectFile) btnConnectFile.onclick = ()=> connectExistingFile().catch(e=>{console.warn(e); toast('เชื่อมไฟล์ไม่สำเร็จ');});
+  const btnCreateFile = $('#btnCreateFile');
+  if(btnCreateFile) btnCreateFile.onclick = ()=> createNewFile().catch(e=>{console.warn(e); toast('สร้างไฟล์ไม่สำเร็จ');});
+  const btnExport = $('#btnExport');
+  if(btnExport) btnExport.onclick = ()=> exportJSONDownload();
+
+  const importFile = $('#importFile');
+  if(importFile){
+    importFile.onchange = async ()=>{
+      const f = importFile.files?.[0];
+      if(!f) return;
+      try{
+        const txt = await f.text();
+        const obj = JSON.parse(txt);
+        validateAndSetData(obj);
+        await idbSet('data', state.data);
+        toast('นำเข้าไฟล์สำเร็จ ✅');
+        render();
+      }catch(e){
+        console.warn(e);
+        toast('นำเข้าไม่สำเร็จ (ไฟล์ไม่ถูกต้อง)');
+      }finally{
+        importFile.value = '';
+      }
+    };
+  }
+
+  const autosaveToggle = $('#autosaveToggle');
+  if(autosaveToggle){
+    autosaveToggle.onchange = ()=>{
+      state.data.settings.autosaveToFile = (autosaveToggle.value === 'true');
+      persistData();
+      updateFileStatus();
+      toast('อัปเดตตั้งค่าแล้ว');
+    };
+  }
+
+  const btnReset = $('#btnReset');
+  if(btnReset){
+    btnReset.onclick = async ()=>{
+      if(!confirm('รีเซ็ตข้อมูลทั้งหมด?')) return;
+      state.data = defaultData();
+      state.data.activeCycleId = state.data.cycles[0].id;
+      await idbSet('data', state.data);
+      toast('รีเซ็ตแล้ว');
+      render();
+    };
+  }
+
+  const btnCopyData = $('#btnCopyData');
+  if(btnCopyData){
+    btnCopyData.onclick = async ()=>{
+      try{
+        await navigator.clipboard.writeText(JSON.stringify(state.data, null, 2));
+        toast('คัดลอก JSON แล้ว 📋');
+      }catch(e){
+        toast('คัดลอกไม่สำเร็จ (อาจต้องใช้ HTTPS)');
+      }
+    };
+  }
+
+  // SETTINGS: save meta, save cycle
+  const btnSaveMeta = $('#btnSaveMeta');
+  if(btnSaveMeta){
+    btnSaveMeta.onclick = ()=>{
+      state.data.meta.farmName = $('#metaFarm').value || '';
+      state.data.meta.owner = $('#metaOwner').value || '';
+      state.data.meta.currency = $('#metaCurrency').value || 'THB';
+      persistData();
+      toast('บันทึกตั้งค่าแล้ว');
+      render();
+    };
+  }
+  const btnSaveCycle = $('#btnSaveCycle');
+  if(btnSaveCycle){
+    btnSaveCycle.onclick = ()=>{
+      cycle.name = $('#cycleName').value || cycle.name;
+      cycle.startDate = $('#cycleStart').value || cycle.startDate;
+      cycle.initialCount = toNum($('#cycleInit').value);
+      cycle.notes = $('#cycleNotes').value || '';
+      // keep tadpoles count aligned if user wants: only if tadpoles count empty or equals old initial; we won't enforce.
+      persistData();
+      toast('บันทึกรอบเลี้ยงแล้ว');
+      render();
+    };
+  }
+
+  // Update raw JSON if present
+  const raw = $('#rawJson');
+  if(raw) raw.value = JSON.stringify(state.data, null, 2);
+
+  updateFileStatus();
+};
+
+// ---------- Boot ----------
+loadApp().catch(err=>{
+  console.error(err);
+  toast('โหลดแอปไม่สำเร็จ');
+});
+</script>
+</body>
+</html>

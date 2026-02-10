@@ -1,0 +1,16 @@
+{
+  "version": 1,
+  "meta": {
+    "owner": "",
+    "farmName": "",
+    "currency": "THB",
+    "createdAt": "",
+    "updatedAt": ""
+  },
+  "settings": {
+    "autosaveToFile": false,
+    "dateLocale": "th-TH"
+  },
+  "cycles": [],
+  "activeCycleId": null
+}
